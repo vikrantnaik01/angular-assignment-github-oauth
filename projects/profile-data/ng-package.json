@@ -1,0 +1,7 @@
+{
+  "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
+  "dest": "../../dist/profile-data",
+  "lib": {
+    "entryFile": "src/src/libs.ts"
+  }
+}
