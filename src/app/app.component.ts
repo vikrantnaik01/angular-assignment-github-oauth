@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { OAuthService } from 'angular-oauth2-oidc';
 
+import { authConfig } from './helpers/auth.config';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -11,30 +13,49 @@ export class AppComponent {
   title = 'GitHubOAuthApp';
   
   constructor(private oauthService: OAuthService, private router: Router) {
-    // this.initialOAuthConfigs();
-    // if(this.oauthService.hasValidAccessToken()) {
-    //     this.router.navigate(['[profile-page]'])
-    // }
-    // else {
-    //   this.login();
-    // }
-    //  console.log(this.oauthService.getAccessToken()); 
+    // this.runInitialLoginSequence();
+  //   this.initialOAuthConfigs();
+  //   if(this.oauthService.hasValidAccessToken()) {
+  //       this.router.navigate(['[profile-page]'])
+  //   }
+  //   else {
+  //     this.login();
+  //   }
+  //    console.log(this.oauthService.getAccessToken()); 
   }
 
   private initialOAuthConfigs () {
-    this.oauthService.loginUrl = 'https://github.com/login/oauth/authorize';
-    this.oauthService.timeoutFactor = 0.75;
-    this.oauthService.redirectUri = 'http://localhost:4200/login';
-    this.oauthService.clientId = '5cccdfa8b4aa0317429b';
-    this.oauthService.logoutUrl = 'http://localhost:4200';
-    this.oauthService.setStorage(window.sessionStorage);
-    this.oauthService.scope = 'read:user openid';
-    this.oauthService.responseType = 'code+token+id_token';
-    // this.oauthService.allow_signup = true;
-    this.oauthService.initLoginFlow();
+    this.oauthService.configure(authConfig);
+    // this.oauthService.fetchTokenUsingPasswordFlowAndLoadUserProfile()
+    // this.oauthService.tryLoginCodeFlow({
+
+    // })
+     this.oauthService.tryLoginCodeFlow({
+      onTokenReceived: context => {
+          //
+          // Output just for purpose of demonstration
+          // Don't try this at home ... ;-)
+          //
+          console.debug("logged in");
+          console.debug(context);
+      },
+      customRedirectUri : 'https://github.com/login/oauth/access_token',
+      onLoginError : (em) => {
+        console.log('Errorororro ', em);
+      } 
+     });
   }
 
   private login() {
-    this.oauthService.initImplicitFlow();
+    this.oauthService.initCodeFlow();
   }
+
+  // private runInitialLoginSequence() {
+  //   this.oauthService.loadDiscoveryDocument()
+  //   .then(() => {
+  //     if (this.oauthService.hasValidAccessToken()) {
+  //       return Promise.resolve();
+  //     }
+  //   });
+  // }
 }
